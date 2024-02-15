@@ -1,4 +1,4 @@
-﻿namespace EntityHomeWork
+﻿namespace EntityHomeWork.Lib
 {
     internal class Program
     {
