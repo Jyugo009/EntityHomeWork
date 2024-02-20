@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using EntityHomeWork.DBModels;
 
-namespace EntityHomeWork;
+namespace EntityHomeWork.DBModels;
 
 public partial class TypeOfPublishingCode
 {

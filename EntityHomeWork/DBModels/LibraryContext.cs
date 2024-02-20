@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using EntityHomeWork.DBModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace EntityHomeWork;
+namespace EntityHomeWork.DBModels;
 
 public partial class LibraryContext : DbContext
 {
@@ -31,6 +30,7 @@ public partial class LibraryContext : DbContext
     public virtual DbSet<TypeOfPublishingCode> TypeOfPublishingCodes { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseSqlServer("Server=DESKTOP-ACEF3H9;Database=Library;Integrated Security=True; Trust Server Certificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -91,6 +91,7 @@ public partial class LibraryContext : DbContext
             entity.Property(e => e.CheckoutDate).HasColumnType("datetime");
             entity.Property(e => e.DaysLeft).HasComputedColumnSql("(datediff(day,getdate(),[DueDate]))", false);
             entity.Property(e => e.DueDate).HasColumnType("datetime");
+            entity.Property(e => e.ReturnDate).HasColumnType("datetime");
             entity.Property(e => e.TakenBy)
                 .HasMaxLength(255)
                 .IsUnicode(false);

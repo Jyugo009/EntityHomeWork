@@ -19,6 +19,8 @@ public partial class Book
 
     public string? CityOfPublishHouse { get; set; }
 
+    public virtual ICollection<BookOnHand> BookOnHands { get; set; } = new List<BookOnHand>();
+
     public virtual TypeOfPublishingCode? PublishingCodeType { get; set; }
 
     public virtual ICollection<Author> Authors { get; set; } = new List<Author>();
