@@ -63,25 +63,49 @@ namespace EntityHomeWork.Program
 
             using (var context = new LibraryContext())
             {
-                var librarian = context.Librarians.FirstOrDefault(u => u.Login == login && u.Password == password);
+                var librarian = context.Librarians.FirstOrDefault(u => u.Login == login);
 
-                var reader = context.Readers.FirstOrDefault(u => u.Login == login && u.Password == password);
-
+                // Verify Password
                 if (librarian != null)
                 {
-                    LibrarianOptions(librarian);
+                    if (!VerifyPassword(password, librarian.PasswordHash, librarian.PasswordSalt))
+                        Console.WriteLine("Invalid password.");
+                    else
+                        LibrarianOptions(librarian);
+
+                    return;
                 }
 
-                else if (reader != null)
+                var reader = context.Readers.FirstOrDefault(u => u.Login == login);
+
+                if (reader != null)
                 {
-                    ReaderOptions(reader);
+                    if (!VerifyPassword(password, reader.PasswordHash, reader.PasswordSalt))
+                        Console.WriteLine("Invalid password.");
+                    else
+                        ReaderOptions(reader);
+
+                    return;
                 }
 
-                else
+                Console.WriteLine("User does not exist.");
+            }
+        }
+
+        private static bool VerifyPassword(string enteredPassword, byte[] storedHash, byte[] storedSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(storedSalt))
+            {
+                var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(enteredPassword));
+
+                for (int i = 0; i < computedHash.Length; i++)
                 {
-                    Console.WriteLine("Wrong Login/Password or User does not exist.");
+                    if (computedHash[i] != storedHash[i])
+                        return false;
                 }
             }
+
+            return true;
         }
 
         private static void ReaderOptions(Reader reader)
@@ -872,10 +896,13 @@ namespace EntityHomeWork.Program
 
                 try
                 {
+                    CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
                     context.Readers.Add(new Reader()
                     {
                         Login = login,
-                        Password = password,
+                        PasswordHash = passwordHash,
+                        PasswordSalt = passwordSalt,
                         Email = readerEmail,
                         FirstName = readerFirstName,
                         LastName = readerLastName,
@@ -929,7 +956,16 @@ namespace EntityHomeWork.Program
 
                 if (librarianEmail != null && login != null && password != null)
                 {
-                    context.Librarians.Add(new Librarian() { Login = login, Password = password, Email = librarianEmail });
+                    CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
+                    context.Librarians.Add(new Librarian()
+                    {
+                        Login = login,
+                        PasswordHash = passwordHash,
+                        PasswordSalt = passwordSalt,
+                        Email = librarianEmail
+                    });
+
                     Console.WriteLine($"Librarian account created successfully!");
                     context.SaveChanges();
                 }
@@ -937,6 +973,15 @@ namespace EntityHomeWork.Program
                 {
                     Console.WriteLine("Something went wrong. Try again, checking for every entry.");
                 }
+            }
+        }
+
+        private static void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
+        {
+            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
             }
         }
     }

@@ -7,8 +7,6 @@ public partial class Reader
 {
     public string Login { get; set; } = null!;
 
-    public string Password { get; set; } = null!;
-
     public string? Email { get; set; }
 
     public string FirstName { get; set; } = null!;
@@ -18,6 +16,10 @@ public partial class Reader
     public int? DocumentTypeId { get; set; }
 
     public string DocumentNumber { get; set; } = null!;
+
+    public byte[]? PasswordHash { get; set; }
+
+    public byte[]? PasswordSalt { get; set; }
 
     public virtual ICollection<BookOnHand> BookOnHands { get; set; } = new List<BookOnHand>();
 
